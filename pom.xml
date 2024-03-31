@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>test-jni</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jni.libraryName>Native</jni.libraryName>
+        <jni.codePath>${project.basedir}/src/main/native</jni.codePath>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-headers</id>
+                        <phase>compile</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <target>
+                                <exec executable="bash">
+                                    <arg value="-c"/>
+                                    <arg line='"find ${project.basedir} -name "*.java" > .sources.txt"'/>
+                                </exec>
+                                <exec executable="javac">
+                                    <arg value="-h"/>
+                                    <arg value="${jni.codePath}"/>
+                                    <arg value="-d"/>
+                                    <arg value="${project.build.outputDirectory}"/>
+                                    <arg value="@.sources.txt"/>
+                                </exec>
+                                <exec executable="rm">
+                                    <arg line=".sources.txt"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make</id>
+                        <phase>compile</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <target>
+                                <exec executable="cmake" dir="${jni.codePath}" failonerror="true">
+                                    <arg line=". -DNATIVE_LIBRARY_NAME=${jni.libraryName}" />
+                                </exec>
+                                <exec executable="make" dir="${jni.codePath}" failonerror="true">
+                                    <arg line="VERBOSE=1"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
