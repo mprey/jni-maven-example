@@ -19,32 +19,20 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-h</arg>
+                        <arg>${jni.codePath}</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
-                    <execution>
-                        <id>generate-headers</id>
-                        <phase>compile</phase>
-                        <goals><goal>run</goal></goals>
-                        <configuration>
-                            <target>
-                                <exec executable="bash">
-                                    <arg value="-c"/>
-                                    <arg line='"find ${project.basedir} -name "*.java" > .sources.txt"'/>
-                                </exec>
-                                <exec executable="javac">
-                                    <arg value="-h"/>
-                                    <arg value="${jni.codePath}"/>
-                                    <arg value="-d"/>
-                                    <arg value="${project.build.outputDirectory}"/>
-                                    <arg value="@.sources.txt"/>
-                                </exec>
-                                <exec executable="rm">
-                                    <arg line=".sources.txt"/>
-                                </exec>
-                            </target>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>make</id>
                         <phase>compile</phase>
